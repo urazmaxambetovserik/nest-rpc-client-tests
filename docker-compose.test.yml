@@ -1,0 +1,36 @@
+services:
+  rmq:
+    image: rabbitmq:3-management
+    ports:
+      - 5672:5672
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  nats:
+    image: nats
+    ports:
+      - 4222:4222
+
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend/
+    depends_on:
+      nats:
+        condition: service_started
+      rmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy

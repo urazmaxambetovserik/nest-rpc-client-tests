@@ -7,17 +7,17 @@ async function bootstrap() {
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
-    options: { urls: ['amqp://localhost:5672'] },
+    options: { urls: ['amqp://rmq:5672'], queue: 'rmq' },
   });
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.REDIS,
-    options: { host: 'localhost', port: 6379 },
+    options: { host: 'redis', port: 6379 },
   });
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.NATS,
-    options: { servers: ['nats://localhost:4222'] },
+    options: { servers: ['nats://nats:4222'] },
   });
 
   await app.startAllMicroservices();

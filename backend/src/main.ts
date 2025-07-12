@@ -20,6 +20,12 @@ async function bootstrap() {
     options: { servers: ['nats://nats:4222'] },
   });
 
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.TCP,
+    options: { host: '0.0.0.0', port: 3002 },
+  });
+
+  app.useLogger(['log', 'error', 'warn', 'debug', 'verbose']);
   await app.startAllMicroservices();
   await app.listen(process.env.PORT ?? 3000);
 }

@@ -25,6 +25,11 @@ export class AppController {
     return { transport: 'rmq', payload };
   }
 
+  @MessagePattern('some', Transport.TCP)
+  tcpSome(@Payload() payload: object) {
+    return { transport: 'tcp', payload };
+  }
+
   @EventPattern('event', Transport.NATS)
   natsEvent(@Payload() payload: object) {
     this.events.push({ transport: 'nats', payload });
@@ -38,6 +43,11 @@ export class AppController {
   @EventPattern('event', Transport.RMQ)
   rmqEvent(@Payload() payload: object) {
     this.events.push({ transport: 'rmq', payload });
+  }
+
+  @EventPattern('event', Transport.TCP)
+  tcpEvent(@Payload() payload: object) {
+    this.events.push({ transport: 'tcp', payload });
   }
 
   // For test events

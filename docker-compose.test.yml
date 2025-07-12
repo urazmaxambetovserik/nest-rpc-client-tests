@@ -34,3 +34,5 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    ports:
+      - 3002:3002 # for tcp transport

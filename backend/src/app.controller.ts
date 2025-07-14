@@ -1,11 +1,14 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseFilters } from '@nestjs/common';
 import {
   EventPattern,
   MessagePattern,
   Payload,
+  RpcException,
   Transport,
 } from '@nestjs/microservices';
+import { AppExceptionFilter } from './app-exception.filter';
 
+@UseFilters(new AppExceptionFilter())
 @Controller()
 export class AppController {
   private events: { transport: string; payload: object }[] = [];
@@ -48,6 +51,28 @@ export class AppController {
   @EventPattern('event', Transport.TCP)
   tcpEvent(@Payload() payload: object) {
     this.events.push({ transport: 'tcp', payload });
+  }
+
+  @MessagePattern('send_error', Transport.NATS)
+  natsSendError(@Payload() payload: object) {
+    throw new RpcException({ transport: 'nats', payload });
+  }
+
+  @MessagePattern('send_error', Transport.REDIS)
+  redisSendError(@Payload() payload: object) {
+    console.log('redis err');
+    console.log(payload);
+    throw new RpcException({ transport: 'redis', payload });
+  }
+
+  @MessagePattern('send_error', Transport.RMQ)
+  rmqSendError(@Payload() payload: object) {
+    throw new RpcException({ transport: 'rmq', payload });
+  }
+
+  @MessagePattern('send_error', Transport.TCP)
+  tcpSendError(@Payload() payload: object) {
+    throw new RpcException({ transport: 'tcp', payload });
   }
 
   // For test events

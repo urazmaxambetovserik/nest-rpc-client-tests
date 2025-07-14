@@ -26,6 +26,7 @@ async function bootstrap() {
   });
 
   app.useLogger(['log', 'error', 'warn', 'debug', 'verbose']);
+
   await app.startAllMicroservices();
   await app.listen(process.env.PORT ?? 3000);
 }

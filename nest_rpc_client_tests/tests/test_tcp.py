@@ -1,6 +1,7 @@
 import pytest
 from nest_rpc_client.client import Client
 from nest_rpc_client.config.tcp import TCPConfig
+from nest_rpc_client.exceptions.rpc import RpcException
 from nest_rpc_client.transports.tcp import TCPTransport
 
 
@@ -12,7 +13,7 @@ def client():
 
 
 @pytest.mark.asyncio
-async def test_redis_send(client: Client):
+async def test_tcp_send(client: Client):
     async with client:
         some_very_big_text = "some" * 100000
         response = await client.send("some", {"some": some_very_big_text})
@@ -21,7 +22,7 @@ async def test_redis_send(client: Client):
 
 
 @pytest.mark.asyncio
-async def test_redis_emit(client: Client):
+async def test_tcp_emit(client: Client):
     async with client:
         response = await client.emit("event", {"some": "data to redis"})
         assert response is None
@@ -31,3 +32,18 @@ async def test_redis_emit(client: Client):
         assert sent_events[0]["payload"] == {"some": "data to redis"}
 
         await client.send("clear_events", {})
+
+
+@pytest.mark.asyncio
+async def test_tcp_send_error(client: Client):
+    async with client:
+        with pytest.raises(RpcException) as e:
+            await client.send(
+                "send_error",
+                {"send": "error payload"},
+            )
+
+        assert e.value.err == {
+            "transport": "tcp",
+            "payload": {"send": "error payload"},
+        }

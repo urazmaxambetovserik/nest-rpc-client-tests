@@ -1,6 +1,7 @@
 import pytest
 from nest_rpc_client.client import Client
 from nest_rpc_client.config.rabbitmq import RabbitMQConfig
+from nest_rpc_client.exceptions.rpc import RpcException
 from nest_rpc_client.transports.rabbitmq import RabbitMQTransport
 
 
@@ -30,3 +31,18 @@ async def test_rabbitmq_emit(client: Client):
         assert sent_events[0]["payload"] == {"some": "value to rmq"}
 
         await client.send("clear_events", {})
+
+
+@pytest.mark.asyncio
+async def test_rabbitmq_send_error(client: Client):
+    async with client:
+        with pytest.raises(RpcException) as e:
+            await client.send(
+                "send_error",
+                {"send": "error payload"},
+            )
+
+        assert e.value.err == {
+            "transport": "rmq",
+            "payload": {"send": "error payload"},
+        }
